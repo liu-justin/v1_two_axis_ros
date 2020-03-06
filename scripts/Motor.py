@@ -86,21 +86,17 @@ class Motor(object):
 
     @property
     def motorIndex(self):
-        print("getting motorIndex")
         return self._motorIndex
 
     @motorIndex.setter
     def motorIndex(self, mi):
-        print("setting motorIndex")
         self._motorIndex = mi
 
     @property
     def tupleIndex(self):
-        print('getter called')
         return self._tupleIndex
 
     @tupleIndex.setter
     def tupleIndex(self, newIndex):
-        print("setter called")
         self._tupleIndex = newIndex  
         self.state = "moving" if self.tupleIndexInRange() else "ready"

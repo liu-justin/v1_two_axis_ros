@@ -12,28 +12,28 @@ import math
 import numpy as np
 import time
 
-def handle_endpoints_test(req):
+def handle_move_point(req):
     mm.allReset()
-    first = p.Point(req.startPointX, req.startPointY)
-    second = p.Point(req.endPointX, req.endPointY)
-    p.linearTravel(first, second, mm)
+    endPoint = p.Point(req.pointX, req.pointY)
+    p.linearTravel(mm.currentPoint, endPoint, mm)
     s.getSteps(mm)
     talker()
-    # R0Time = [data[2] for data in mm[0].stepTuple]
-    # R0Direction = [data[3] for data in mm[0].stepTuple]
-    # RATime = [data[2] for data in mm[1].stepTuple]
-    # RADirection = [data[3] for data in mm[1].stepTuple]
-    return EndpointsTestResponse(mm[0].stepTuple != [])
+    return MovePointResponse("moving to point done, ending double service")
 
-# def handle_steps_to_arduino(req):
-#     nextSet = mm[req.startByte].stepTuple.pop()
-#     return NextStepResponse(nextSet[2], nextSet[3])
+def handle_home(req):
+    mm.allReset()
+    endPoint = p.Point(0, 10)
+    p.linearTravel(mm.currentPoint, endPoint, mm)
+    s.getSteps(mm)
+    talker()
 
-def endpoints_test_server():
-    rospy.init_node('endpoints_test_server')
-    s = rospy.Service('endpoints_test', EndpointsTest, handle_endpoints_test)
+def mains_server():
+    rospy.init_node('mains_server')
+    move_point_server = rospy.Service('move_point_service', MovePoint, handle_move_point)
+    home_server = rospy.Service('home_service', Home, handle_home)
+    # rospy.Subscriber("chatter_limit_switch", limit_switched, "send motor index to error")
     # s2 = rospy.Service("fetching_next_steps", NextStep, handle_steps_to_arduino)
-    print "Convert Endpoints to steps and start stepping."
+    print("Ready to receive commands.")
     rospy.spin()
 
 def talker():
@@ -53,23 +53,9 @@ def talker():
                 print(motor.state)
                 motor.previousTime = currentTime
 
-# def talker():
-#     pub = rospy.Publisher('chatter_idx_dir', blind_idx_dir, queue_size=1)
-#     mm.setAllPreviousTime(time.clock())
-#     while(mm.allIndicesInRange()):
-#         for motor in [motor for motor in mm if motor.tupleIndexInRange()]:
-#             currentTime = time.clock()
-#             if (currentTime - motor.previousTime > motor.stepTuple[motor.tupleIndex][2]):
-#                 rospy.loginfo(motor.stepTuple[motor.tupleIndex][3])
-#                 print("motor: %s"%motor.motorIndex, "index: %s"%motor.tupleIndex, "direction sent: %s"%motor.stepTuple[motor.tupleIndex][3])
-#                 pub.publish(motor.motorIndex, motor.stepTuple[motor.tupleIndex][3])
-#                 motor.changeStep(motor.stepTuple[motor.tupleIndex][3])
-#                 motor.tupleIndex += 1
-#                 motor.previousTime = currentTime
-
 if __name__ == "__main__":
     mm = MotorList.MotorList()
     R0 = Motor.Motor(mm)
     RA = Motor.Motor(mm)
 
-    endpoints_test_server()
+    mains_server()

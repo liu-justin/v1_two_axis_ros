@@ -1,7 +1,10 @@
+import pointFinder as p
+
 class MotorList:
     def __init__(self):
         # Arduino start reading bytes start at R0 motor, byte 103
         self._motorList = []
+        self.currentPoint = p.Point(5,5)
 
     def append(self, motor):
         self._motorList.append(motor)
