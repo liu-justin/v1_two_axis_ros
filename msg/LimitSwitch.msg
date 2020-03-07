@@ -1,0 +1,2 @@
+int motorIndex
+bool tripped

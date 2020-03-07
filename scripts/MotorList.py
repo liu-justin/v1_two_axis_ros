@@ -33,6 +33,10 @@ class MotorList:
         for m in self._motorList:
             m.state = incomingState
     
+    def setAllFinalSteps(self, incomingStep):
+        for m in self._motorList:
+            m.relativeMoveFinalAngle = smath.majorToMinorSteps(incomingStep)
+
     def allIndicesInRange(self):
         sum = 0
         for m in self._motorList:

@@ -5,12 +5,15 @@ import time
 # can change frameTime to 60, 61-64 reserved for ArduinoStartBytes, and the last 2 bits used for direction
 frameTime = 0.06
 
+minorSteps = 8
 # which single step angle being used, 1.8 for standard, 0.9 for half stepping(i need to change the Seq in Arduino if I change this)
-stepAngle = 1.8 *np.pi/180 / 8
+stepAngle = 1.8 *np.pi/180 / minorSteps
 # stepAngle = 0.01
 
 # speed of the endPoint
 speed = 5 #in/s
+
+homingInterval = 50 # ms for homing
 
 def nearestStep(value):
     if value%stepAngle < stepAngle/2:
@@ -42,6 +45,9 @@ def calcFillerSteps(time):
 
 def calcRoundedTime(k, zeroSteps, deltaT):
 	return int(round(deltaT*(k+1)/(zeroSteps+1)))
+
+def majorToMinorSteps(majorStep):
+	return majorStep*minorSteps
 
 def calcSplitTimes(time, stepTuple):
 	divisor = int(time//(frameTime*1000))

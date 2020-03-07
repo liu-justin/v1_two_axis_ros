@@ -51,7 +51,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   states.msg
-  blind_idx_dir.msg
+  BlindMotorCommand.msg
+  LimitSwitch.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -13,11 +13,12 @@ class Motor(object):
         self._tupleIndex = 1
         self.tupleIndexDeltaT = 0
         self.tupleIndexDirection = 0
+
+        self.relativeMoveFinalStep = 0
+
         self.previousTime = 0
 
         self.step = 0
-
-        # 1:ready, 2:moving, 3:not homed 4: error
         self.state = "ready"
 
     def tupleStepsHalfwayBtwnChange(self):
@@ -78,6 +79,8 @@ class Motor(object):
         self._tupleIndex = 1
         self.previousTime = 0
 
+        self.relativeMoveFinalStep = 0
+
     def changeStep(self, directionBool):
         self.step += 2*(directionBool)-1
 
@@ -100,3 +103,12 @@ class Motor(object):
     def tupleIndex(self, newIndex):
         self._tupleIndex = newIndex  
         self.state = "moving" if self.tupleIndexInRange() else "ready"
+
+    # this is messy, can fix this
+    # @property
+    # def step(self):
+    #     return self._step
+
+    # @step.setter
+    # def step(self, newStep):
+    #     self._step = newStep
