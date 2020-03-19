@@ -24,11 +24,19 @@ def handle_move_point(req):
 
 def handle_home(req):
     mm.allReset()
-    mm.setAllFinalSteps(75) # 135degrees left from vertical
     pub = rospy.Publisher('topic_blind_motor_command', BlindMotorCommand, queue_size=1)
+    rospy.loginfo("setting all final steps to -75, hoping to hit the limit switch")
+    mm.setAllFinalSteps(-75) # 135degrees left from vertical
     move_relative_talker(pub)
+
+    rospy.loginfo("Setting all steps to the CCW endstep")
+    mm.setAllStepsToCCW()
+    rospy.loginfo("getting off of the limit switch with 5 blind steps CW")
+    move_relative_off_limit_switch(pub)
+    rospy.loginfo("setting all goal step to 0")
     mm.setAllFinalSteps(0)
     move_relative_talker(pub)
+    return HomeResponse("done with homing")
 
 def callback_limit_switch(data):
     print(data)
@@ -51,11 +59,11 @@ def move_point_talker(pub):
         for motor in [motor for motor in mm if motor.checkState("moving")]:
             currentTime = time.clock()
             if (currentTime - motor.previousTime > motor.stepTuple[motor.tupleIndex][2]):
-                rospy.loginfo(motor.stepTuple[motor.tupleIndex][3])
-                print("motor: %s"%motor.motorIndex, "index: %s"%motor.tupleIndex, "direction sent: %s"%motor.stepTuple[motor.tupleIndex][3])
+                rospy.loginfo("motor: %s step: %s moveRelativeFinalStep: %s", motor.motorIndex, motor.step, motor.moveRelativeFinalStep)
+                # print("motor: %s"%motor.motorIndex, "index: %s"%motor.tupleIndex, "direction sent: %s"%motor.stepTuple[motor.tupleIndex][3])
                 pub.publish(motor.motorIndex, motor.stepTuple[motor.tupleIndex][3])
                 motor.changeStep(motor.stepTuple[motor.tupleIndex][3])
-                motor.tupleIndex = motor.tupleIndex + 1
+                motor.tupleIndex = motor.tupleIndex + 1 # changing tupleIndex checks the state as well
                 motor.previousTime = currentTime
 
 def move_relative_talker(pub):
@@ -65,16 +73,33 @@ def move_relative_talker(pub):
         for motor in [motor for motor in mm if motor.checkState("moving")]:
             currentTime = time.clock()
             if (currentTime - motor.previousTime > smath.homingInterval):
-                pub.publish(motor.motorIndex, motor.relativeMoveFinalStep < motor.step) # want to go CCW, or negative in steps to home
-                motor.changeStep(motor.relativeMoveFinalStep > motor.step)
-                if (motor.step == motor.relativeMoveFinalStep): # this is messy, can fix this
+                rospy.loginfo("motor: %s step: %s moveRelativeFinalStep: %s", motor.motorIndex, motor.step, motor.moveRelativeFinalStep)
+                # print("motor: %s"%motor.motorIndex, "step: %s"%motor.step, "moveRelativeFinalStep: %s"%motor.moveRelativeFinalStep)
+                pub.publish(motor.motorIndex, motor.moveRelativeFinalStep > motor.step) # want to go CCW, or negative in steps to home
+                motor.changeStep(motor.moveRelativeFinalStep > motor.step)
+                if (motor.step == motor.moveRelativeFinalStep): # this is messy, can fix this with properties in setting step
+                    rospy.loginfo("setting state to ready!")
                     motor.state = "ready"
+                motor.previousTime = currentTime
+
+def move_relative_off_limit_switch(pub):
+    mm.setAllStates("moving")
+    mm.setAllPreviousTimes(time.clock())
+    offLimitSwitchSteps = 10
+    while(offLimitSwitchSteps >= 0):
+        for motor in mm:
+            currentTime = time.clock()
+            if (currentTime - motor.previousTime > smath.homingInterval):
+                rospy.loginfo("motor: %s step: %s moveRelativeFinalStep: %s", motor.motorIndex, motor.step, motor.moveRelativeFinalStep)
+                pub.publish(motor.motorIndex, True) # want to go CCW, or negative in steps to home
+                motor.changeStep(True)
+                offLimitSwitchSteps -= 1
                 motor.previousTime = currentTime
 
 
 if __name__ == "__main__":
     mm = MotorList.MotorList()
-    R0 = Motor.Motor(mm)
-    RA = Motor.Motor(mm)
+    RR = Motor.Motor(mm, -52, 8)
+    RA = Motor.Motor(mm, -25, 15)
 
     mains_server()

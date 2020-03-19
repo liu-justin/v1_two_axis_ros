@@ -1,4 +1,5 @@
 import pointFinder as p
+import stepMath as smath
 
 class MotorList:
     def __init__(self):
@@ -32,10 +33,14 @@ class MotorList:
     def setAllStates(self, incomingState):
         for m in self._motorList:
             m.state = incomingState
+
+    def setAllStepsToCCW(self):
+        for m in self._motorList:
+            m.step = m.CCW_endStep*smath.minorSteps
     
     def setAllFinalSteps(self, incomingStep):
         for m in self._motorList:
-            m.relativeMoveFinalAngle = smath.majorToMinorSteps(incomingStep)
+            m.moveRelativeFinalStep = incomingStep*smath.minorSteps
 
     def allIndicesInRange(self):
         sum = 0
@@ -50,6 +55,6 @@ class MotorList:
 
     def checkAllStates(self, incomingState):
         for motor in self._motorList:
-            if motor.state != incomingState:
-                return False
-        return True
+            if motor.state == incomingState:
+                return True
+        return False

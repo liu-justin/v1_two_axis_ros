@@ -1,2 +1,2 @@
-int motorIndex
+int32 motorIndex
 bool tripped

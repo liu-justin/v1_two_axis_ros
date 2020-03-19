@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "Motor.h"
+#include <MD_CirQueue.h>
 
 Motor::Motor(int pulse, int direct, int limit, int CW, int CCW) {
 	_pulsePin = pulse;
@@ -8,12 +9,11 @@ Motor::Motor(int pulse, int direct, int limit, int CW, int CCW) {
 	pinMode(_pulsePin, OUTPUT);
 	pinMode(_directionPin, OUTPUT);
 	pinMode(_limitPin, INPUT);
+	_previousLimitValue = digitalRead(_limitPin);
 
 	_ccwFlag = CCW;
 	_cwFlag = CW;
 
-	_state = 1;
-	_statePrevious = 1;
 }
 
 // forward is positive angle, so CCW
@@ -40,37 +40,9 @@ void Motor::setDirection(bool incomingDir) {
 	_direction = incomingDir;
 }
 
-void Motor::setStep(int incomingStep) {
-	_step = incomingStep;
-}
-
-int Motor::getStep() {
-	return _step;
-}
-
 void Motor::pulse(){
 	digitalWrite(_pulsePin, HIGH);
 	digitalWrite(_pulsePin, LOW);
-	_step += (2*_direction)-1;
-}
-
-void Motor::setState(int incomingState) {
-	_statePrevious = _state;
-	_state = incomingState;
-	// Serial.print("Setting state to ");
-	// Serial.println(incomingState);
-}
-
-int Motor::getState() {
-	return _state;
-}
-
-int Motor::getStatePrevious() {
-	return _statePrevious;
-}
-
-void Motor::revertState() {
-	_state = _statePrevious;
 }
 
 int Motor::getCCWFlag() {
@@ -85,14 +57,33 @@ int Motor::getLimitPin(){
 	return _limitPin;
 }
 
-int Motor::getRelativeMoveCounter() {
-	return _relativeMoveCounter;
+int Motor::getPreviousLimitValue(){
+	return _previousLimitValue;
 }
 
-void Motor::setRelativeMoveCounter(int incomingCounter) {
-	_relativeMoveCounter = incomingCounter;
+void Motor::setPreviousLimitValue(int incoming){
+	_previousLimitValue = incoming;
 }
 
-void Motor::decrementRelativeMoveCounter() {
-	_relativeMoveCounter -= 1;
+int Motor::pushLimitValue(int incoming) {
+	_limitValues[_limitValuesWritePointer] = incoming;
+	_limitValuesWritePointer++;
+	if (_limitValuesWritePointer >= _limitValuesSize) {
+		_limitValuesWritePointer = 0;
+	}
+}
+
+void Motor::printLimitValues() {
+	for (int i = 0; i < _limitValuesSize; i++) {
+		Serial.print(_limitValues[i]);
+		Serial.print(", ");
+	}
+	Serial.println(" ");
+}
+
+bool Motor::checkLimitValues() {
+	for (int i = 0; i < _limitValuesSize; i++) {
+		if (_limitValues[i] == 1) return true;
+	}
+	return false;
 }

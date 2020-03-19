@@ -15,12 +15,11 @@ class MotorManager {
 		MotorManager(...);
 		Motor* getMotor(int index);
 
-		void setAllStates(int incomingState);
-		void setAllStatesBut(int incomingState, int index);
-		void revertAllStates();
-		void revertAllStatesBut(int index);
-
-		bool checkStates(int incomingState);
+		// void setAllStates(int incomingState);
+		// void setAllStatesBut(int incomingState, int index);
+		// void revertAllStates();
+		// void revertAllStatesBut(int index);
+		// bool checkStates(int incomingState);
 		
 	private:
 		// delcare the pointer to the first motor

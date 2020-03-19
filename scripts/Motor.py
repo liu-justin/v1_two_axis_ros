@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 class Motor(object):
-    def __init__(self, motorList):
+    def __init__(self, motorList, CCW, CW):
         motorList.append(self)
         self._motorIndex = len(motorList)-1
         # Arduino start reading bytes start at R0 motor, byte 103
@@ -13,12 +13,15 @@ class Motor(object):
         self._tupleIndex = 1
         self.tupleIndexDeltaT = 0
         self.tupleIndexDirection = 0
+        
+        self.CCW_endStep = CCW
+        self.CW_endStep = CW
 
-        self.relativeMoveFinalStep = 0
+        self.moveRelativeFinalStep = 0
 
         self.previousTime = 0
 
-        self.step = 0
+        self.step = 0 # this is the real step with minorStep
         self.state = "ready"
 
     def tupleStepsHalfwayBtwnChange(self):
@@ -79,7 +82,7 @@ class Motor(object):
         self._tupleIndex = 1
         self.previousTime = 0
 
-        self.relativeMoveFinalStep = 0
+        self.moveRelativeFinalStep = 0
 
     def changeStep(self, directionBool):
         self.step += 2*(directionBool)-1

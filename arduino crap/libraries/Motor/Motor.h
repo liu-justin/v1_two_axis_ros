@@ -4,6 +4,7 @@
 /*provides stepper Motor control thru single steps*/
 
 #include "Arduino.h"
+#include <MD_CirQueue.h>
 
 class Motor {
 	public:
@@ -17,21 +18,18 @@ class Motor {
 		void pulse();
 		
 		int getLimitPin();
+		int getPreviousLimitValue();
+		void setPreviousLimitValue(int incoming);
+
+		int pushLimitValue(int incoming);
+		bool checkLimitValues();
+		void printLimitValues();
 
 		void setStep(int incomingStep);
 		int getStep();
-		
-		void setState(int incomingState);
-		int getState();
-		int getStatePrevious();
-		void revertState();
 
 		int getCWFlag();
 		int getCCWFlag();
-
-		void decrementRelativeMoveCounter();
-		int getRelativeMoveCounter();
-		void setRelativeMoveCounter(int incomingCounter);
 
 		unsigned long previousTime;
 		
@@ -40,12 +38,13 @@ class Motor {
 		int _pulsePin;
 		int _directionPin;
 		int _limitPin;
+		int _previousLimitValue;
 
-		int _relativeMoveCounter;
+		int _limitValuesWritePointer = 0;
+		static const int _limitValuesSize = 4;
+		int _limitValues[_limitValuesSize] = {0,0,0,0};
+
 		bool _direction;
-		int _step;
-		int _state;
-		int _statePrevious;
 		int _ccwFlag;
 		int _cwFlag;
 

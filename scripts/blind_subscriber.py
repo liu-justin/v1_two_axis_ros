@@ -3,8 +3,8 @@ import rospy
 from v1_two_axis.msg import *
 
 def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.direction)
-    
+    # rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.direction)
+    rospy.loginfo("I heard motorIndex: %s tripped: %s", data.motorIndex, data.tripped)
 def listener():
 
     # In ROS, nodes are uniquely named. If two nodes with the same
@@ -14,7 +14,7 @@ def listener():
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber("chatter_idx_dir", blind_idx_dir, callback)
+    rospy.Subscriber("topic_limit_switch", LimitSwitch, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()

@@ -1,5 +1,5 @@
-#ifndef _ROS_v1_two_axis_blind_idx_dir_h
-#define _ROS_v1_two_axis_blind_idx_dir_h
+#ifndef _ROS_v1_two_axis_BlindMotorCommand_h
+#define _ROS_v1_two_axis_BlindMotorCommand_h
 
 #include <stdint.h>
 #include <string.h>
@@ -9,7 +9,7 @@
 namespace v1_two_axis
 {
 
-  class blind_idx_dir : public ros::Msg
+  class BlindMotorCommand : public ros::Msg
   {
     public:
       typedef int32_t _index_type;
@@ -17,7 +17,7 @@ namespace v1_two_axis
       typedef bool _direction_type;
       _direction_type direction;
 
-    blind_idx_dir():
+    BlindMotorCommand():
       index(0),
       direction(0)
     {
@@ -71,7 +71,7 @@ namespace v1_two_axis
      return offset;
     }
 
-    const char * getType(){ return "v1_two_axis/blind_idx_dir"; };
+    const char * getType(){ return "v1_two_axis/BlindMotorCommand"; };
     const char * getMD5(){ return "e61cdc3062b1a9c045802395887eefa9"; };
 
   };

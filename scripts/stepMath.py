@@ -13,7 +13,7 @@ stepAngle = 1.8 *np.pi/180 / minorSteps
 # speed of the endPoint
 speed = 5 #in/s
 
-homingInterval = 50 # ms for homing
+homingInterval = 0.050 #  50 ms for homing
 
 def nearestStep(value):
     if value%stepAngle < stepAngle/2:

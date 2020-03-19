@@ -30,7 +30,6 @@ def mains_client(incomingCommand): # just to make it different from the name of 
         prox = rospy.ServiceProxy(commandedService, commandDict[incomingCommand[0]])
         # removing the first part of the incomingCommand, the string command so that the rest of the list can be passed in prox as args
         incomingCommand.pop(0)
-        print(incomingCommand)
         response = prox(*incomingCommand)
         print(response)
 

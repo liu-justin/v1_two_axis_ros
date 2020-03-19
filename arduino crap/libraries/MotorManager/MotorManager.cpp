@@ -31,36 +31,36 @@ Motor* MotorManager::getMotor(int index) {
 	return _motorList[index];
 }
 
-void MotorManager::setAllStates(int incomingState) {
-	for (int i = 0; i < MOTOR_COUNT; i++) {
-		_motorList[i]->setState(incomingState);
-	}
-}
+// void MotorManager::setAllStates(int incomingState) {
+// 	for (int i = 0; i < MOTOR_COUNT; i++) {
+// 		_motorList[i]->setState(incomingState);
+// 	}
+// }
 
-void MotorManager::setAllStatesBut(int incomingState, int index) {
-	for (int i = 0; i < MOTOR_COUNT; i++) {
-		if (i != index)
-			_motorList[i]->setState(incomingState);
-	}
-}
+// void MotorManager::setAllStatesBut(int incomingState, int index) {
+// 	for (int i = 0; i < MOTOR_COUNT; i++) {
+// 		if (i != index)
+// 			_motorList[i]->setState(incomingState);
+// 	}
+// }
 
-void MotorManager::revertAllStates() {
-	for (int i = 0; i < MOTOR_COUNT; i++) {
-		_motorList[i]->revertState();
-	}	
-}
+// void MotorManager::revertAllStates() {
+// 	for (int i = 0; i < MOTOR_COUNT; i++) {
+// 		_motorList[i]->revertState();
+// 	}	
+// }
 
-void MotorManager::revertAllStatesBut(int index) {
-	for (int i = 0; i < MOTOR_COUNT; i++) {
-		if(i != index)
-			_motorList[i]->revertState();
-	}	
-}
+// void MotorManager::revertAllStatesBut(int index) {
+// 	for (int i = 0; i < MOTOR_COUNT; i++) {
+// 		if(i != index)
+// 			_motorList[i]->revertState();
+// 	}	
+// }
 
-bool MotorManager::checkStates(int incomingState) {
-	for (int i = 0; i < MOTOR_COUNT; i++) {
-		if (_motorList[i]->getState() != incomingState)
-			return false;
-	}
-	return true;
-}
+// bool MotorManager::checkStates(int incomingState) {
+// 	for (int i = 0; i < MOTOR_COUNT; i++) {
+// 		if (_motorList[i]->getState() != incomingState)
+// 			return false;
+// 	}
+// 	return true;
+// }
