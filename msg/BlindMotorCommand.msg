@@ -1,2 +1,2 @@
 int32 index
-bool direction
+bool rotationDirection

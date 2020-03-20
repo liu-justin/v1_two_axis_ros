@@ -2,7 +2,7 @@
 #include "Motor.h"
 #include <MD_CirQueue.h>
 
-Motor::Motor(int pulse, int direct, int limit, int CW, int CCW) {
+Motor::Motor(int pulse, int direct, int limit) {
 	_pulsePin = pulse;
 	_directionPin = direct;
 	_limitPin = limit;
@@ -10,9 +10,6 @@ Motor::Motor(int pulse, int direct, int limit, int CW, int CCW) {
 	pinMode(_directionPin, OUTPUT);
 	pinMode(_limitPin, INPUT);
 	_previousLimitValue = digitalRead(_limitPin);
-
-	_ccwFlag = CCW;
-	_cwFlag = CW;
 
 }
 
@@ -38,19 +35,12 @@ void Motor::directionChange(){
 // should be a 0 (directionBackwards) or 1(directionForwards) coming in
 void Motor::setDirection(bool incomingDir) {
 	_direction = incomingDir;
+	digitalWrite(_directionPin, _direction);
 }
 
 void Motor::pulse(){
 	digitalWrite(_pulsePin, HIGH);
 	digitalWrite(_pulsePin, LOW);
-}
-
-int Motor::getCCWFlag() {
-	return _ccwFlag;
-}
-
-int Motor::getCWFlag() {
-	return _cwFlag;
 }
 
 int Motor::getLimitPin(){
@@ -65,12 +55,14 @@ void Motor::setPreviousLimitValue(int incoming){
 	_previousLimitValue = incoming;
 }
 
-int Motor::pushLimitValue(int incoming) {
-	_limitValues[_limitValuesWritePointer] = incoming;
+int Motor::pushLimitValue() {
+	_limitValues[_limitValuesWritePointer] = digitalRead(_limitPin);
 	_limitValuesWritePointer++;
 	if (_limitValuesWritePointer >= _limitValuesSize) {
 		_limitValuesWritePointer = 0;
 	}
+	_previousLimitValue = _currentLimitValue;
+	_currentLimitValue = checkLimitValues();
 }
 
 void Motor::printLimitValues() {
@@ -79,6 +71,14 @@ void Motor::printLimitValues() {
 		Serial.print(", ");
 	}
 	Serial.println(" ");
+}
+
+bool Motor::limitValueChanged() {
+	return _currentLimitValue != _previousLimitValue;
+}
+
+bool Motor::getCurrentLimitValue() {
+	return _currentLimitValue;
 }
 
 bool Motor::checkLimitValues() {

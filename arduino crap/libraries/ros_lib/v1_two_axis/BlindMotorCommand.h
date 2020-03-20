@@ -14,12 +14,12 @@ namespace v1_two_axis
     public:
       typedef int32_t _index_type;
       _index_type index;
-      typedef bool _direction_type;
-      _direction_type direction;
+      typedef bool _rotationDirection_type;
+      _rotationDirection_type rotationDirection;
 
     BlindMotorCommand():
       index(0),
-      direction(0)
+      rotationDirection(0)
     {
     }
 
@@ -39,10 +39,10 @@ namespace v1_two_axis
       union {
         bool real;
         uint8_t base;
-      } u_direction;
-      u_direction.real = this->direction;
-      *(outbuffer + offset + 0) = (u_direction.base >> (8 * 0)) & 0xFF;
-      offset += sizeof(this->direction);
+      } u_rotationDirection;
+      u_rotationDirection.real = this->rotationDirection;
+      *(outbuffer + offset + 0) = (u_rotationDirection.base >> (8 * 0)) & 0xFF;
+      offset += sizeof(this->rotationDirection);
       return offset;
     }
 
@@ -63,16 +63,16 @@ namespace v1_two_axis
       union {
         bool real;
         uint8_t base;
-      } u_direction;
-      u_direction.base = 0;
-      u_direction.base |= ((uint8_t) (*(inbuffer + offset + 0))) << (8 * 0);
-      this->direction = u_direction.real;
-      offset += sizeof(this->direction);
+      } u_rotationDirection;
+      u_rotationDirection.base = 0;
+      u_rotationDirection.base |= ((uint8_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      this->rotationDirection = u_rotationDirection.real;
+      offset += sizeof(this->rotationDirection);
      return offset;
     }
 
     const char * getType(){ return "v1_two_axis/BlindMotorCommand"; };
-    const char * getMD5(){ return "e61cdc3062b1a9c045802395887eefa9"; };
+    const char * getMD5(){ return "70b6c99c3636069438948369e041b3ab"; };
 
   };
 

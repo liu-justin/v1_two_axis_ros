@@ -8,7 +8,7 @@
 
 class Motor {
 	public:
-		Motor(int pulse, int direct, int limit, int CW, int CCW);
+		Motor(int pulse, int direct, int limit);
 
 		void directionForward(); // CCW
 		void directionBackward(); // CW
@@ -21,15 +21,14 @@ class Motor {
 		int getPreviousLimitValue();
 		void setPreviousLimitValue(int incoming);
 
-		int pushLimitValue(int incoming);
+		int pushLimitValue();
 		bool checkLimitValues();
 		void printLimitValues();
+		bool limitValueChanged();
+		bool getCurrentLimitValue();
 
 		void setStep(int incomingStep);
 		int getStep();
-
-		int getCWFlag();
-		int getCCWFlag();
 
 		unsigned long previousTime;
 		
@@ -39,14 +38,13 @@ class Motor {
 		int _directionPin;
 		int _limitPin;
 		int _previousLimitValue;
+		int _currentLimitValue;
 
 		int _limitValuesWritePointer = 0;
-		static const int _limitValuesSize = 4;
-		int _limitValues[_limitValuesSize] = {0,0,0,0};
+		static const int _limitValuesSize = 20;
+		int _limitValues[_limitValuesSize] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 		bool _direction;
-		int _ccwFlag;
-		int _cwFlag;
 
 };
 
