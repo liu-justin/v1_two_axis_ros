@@ -5,19 +5,21 @@ from v1_two_axis.msg import *
 import rospy
 
 import stepFinder as s
-import pointFinder as p
-import basicShapes as bs
+import pointFinder as pf
+import Point as p
 import stepMath as smath
 import Motor
 import MotorList
 import math
 import numpy as np
 import time
+import CoordinateSystemConstants as csc
+import CoordinateSystem as cs
 
 def handle_move_point(req):
     mm.allReset()
-    endPoint = bs.Point(req.pointX, req.pointY)
-    p.linearTravel(mm.currentPoint, endPoint, mm)
+    endPoint = p.Point(req.pointX, 0,  req.pointY)
+    pf.linearTravel(csm, mm, mm.currentPoint, endPoint)
     s.getSteps(mm)
     pub = rospy.Publisher('topic_blind_motor_command', BlindMotorCommand, queue_size=1)
     move_point_talker(pub)
@@ -41,7 +43,7 @@ def handle_home(req):
     move_relative_off_limit_switch(pub)
 
     move_relative_talker(pub)
-    mm.currentPoint = 
+    # mm.currentPoint = 
     return HomeResponse("done with homing")
 
 def callback_limit_switch(data):
@@ -107,5 +109,7 @@ if __name__ == "__main__":
     mm = MotorList.MotorList()
     RR = Motor.Motor(mm, -52, 8)
     RA = Motor.Motor(mm, -26, 15)
+    csm = cs.coordinateSystemManager(csc.mainCS)
+    csm.addCoordinateSystem(motorRC = csc.motorRC, motorRR = csc.motorRR, motorRT = csc.motorRT)
 
     mains_server()
