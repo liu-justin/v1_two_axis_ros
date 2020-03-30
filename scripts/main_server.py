@@ -6,6 +6,7 @@ import rospy
 
 import stepFinder as s
 import pointFinder as p
+import basicShapes as bs
 import stepMath as smath
 import Motor
 import MotorList
@@ -15,33 +16,32 @@ import time
 
 def handle_move_point(req):
     mm.allReset()
-    endPoint = p.Point(req.pointX, req.pointY)
+    endPoint = bs.Point(req.pointX, req.pointY)
     p.linearTravel(mm.currentPoint, endPoint, mm)
     s.getSteps(mm)
     pub = rospy.Publisher('topic_blind_motor_command', BlindMotorCommand, queue_size=1)
     move_point_talker(pub)
+    mm.currentPoint = endPoint
     return MovePointResponse("moving to point done, ending double service")
 
 def handle_home(req):
     mm.allReset()
     pub = rospy.Publisher('topic_blind_motor_command', BlindMotorCommand, queue_size=1)
-    rospy.loginfo("setting all final steps to -15, hoping to hit the limit switch")
-    mm.setAllFinalSteps(-10) # 135degrees left from vertical
+    rospy.loginfo("setting all final steps to -75, hoping to hit the limit switch")
+    mm.setAllFinalSteps(-75) # 135degrees left from vertical
     move_relative_talker(pub)
-    rospy.loginfo("setting all final steps to 0")
+
+    rospy.loginfo("Setting all steps to the CCW endstep")
+    mm.setAllStepsToCCW()
+
+    rospy.loginfo("setting all goal steps to 0")
     mm.setAllFinalSteps(0)
+
+    rospy.loginfo("getting off of the limit switch with 5 blind steps CW")
+    move_relative_off_limit_switch(pub)
+
     move_relative_talker(pub)
-
-    # rospy.loginfo("Setting all steps to the CCW endstep")
-    # mm.setAllStepsToCCW()
-
-    # rospy.loginfo("setting all goal steps to 0")
-    # mm.setAllFinalSteps(0)
-
-    # rospy.loginfo("getting off of the limit switch with 5 blind steps CW")
-    # move_relative_off_limit_switch(pub)
-
-    # move_relative_talker(pub)
+    mm.currentPoint = 
     return HomeResponse("done with homing")
 
 def callback_limit_switch(data):
@@ -83,13 +83,13 @@ def move_relative_talker(pub):
 def move_relative_off_limit_switch(pub):
     mm.setAllStates("moving")
     mm.setAllPreviousTimes(time.clock())
-    offLimitSwitchSteps = 20
+    offLimitSwitchSteps = 40
     while(offLimitSwitchSteps >= 0):
         for motor in mm:
             currentTime = time.clock()
             if (currentTime - motor.previousTime > smath.homingInterval):
                 rospy.loginfo("motor: %s step: %s moveRelativeFinalStep: %s", motor.motorIndex, motor.step, motor.moveRelativeFinalStep)
-                pub.publish(motor.motorIndex, False) # want to go CCW, or negative in steps to home
+                pub.publish(motor.motorIndex, True) # want to go CCW, or negative in steps to home
                 motor.changeStep(True)
                 offLimitSwitchSteps -= 1
                 motor.previousTime = currentTime
@@ -106,6 +106,6 @@ def mains_server():
 if __name__ == "__main__":
     mm = MotorList.MotorList()
     RR = Motor.Motor(mm, -52, 8)
-    RA = Motor.Motor(mm, -25, 15)
+    RA = Motor.Motor(mm, -26, 15)
 
     mains_server()

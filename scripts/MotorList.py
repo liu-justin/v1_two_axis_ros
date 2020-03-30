@@ -1,11 +1,11 @@
-import pointFinder as p
+import basicShapes as bs
 import stepMath as smath
 
-class MotorList:
+class MotorList(object):
     def __init__(self):
         # Arduino start reading bytes start at R0 motor, byte 103
         self._motorList = []
-        self.currentPoint = p.Point(5,5)
+        self._currentPoint = bs.Point(5,5)
 
     def append(self, motor):
         self._motorList.append(motor)
@@ -58,3 +58,11 @@ class MotorList:
             if motor.state == incomingState:
                 return True
         return False
+
+    @property
+    def currentPoint(self):
+        return self._currentPoint
+
+    @currentPoint.setter
+    def currentPoint(self, incomingPoint):
+        self._currentPoint = incomingPoint

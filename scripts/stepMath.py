@@ -11,9 +11,12 @@ stepAngle = 1.8 *np.pi/180 / minorSteps
 # stepAngle = 0.01
 
 # speed of the endPoint
-speed = 5 #in/s
+speed = 2 #in/s
 
-homingInterval = 0.050 #  50 ms for homing
+homingInterval = 0.025 #  50 ms for homing
+
+def majorSteptoRadian(incomingStep):
+	return 2*np.pi*incomingStep/200
 
 def nearestStep(value):
     if value%stepAngle < stepAngle/2:
