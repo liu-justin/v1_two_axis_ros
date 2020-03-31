@@ -3,10 +3,10 @@ import numpy as np
 import math
 
 class Motor(object):
-    def __init__(self, motorList, CCW, CW):
-        motorList.append(self)
-        self._motorIndex = len(motorList)-1
+    def __init__(self, motorIndex, CCW, CW):
         # Arduino start reading bytes start at R0 motor, byte 103
+        # self.arduinoStartByte = self._motorIndex + 105
+        self._motorIndex = motorIndex 
         self.arduinoStartByte = self._motorIndex + 105
         self.frameList = []
         self.stepTuple = [] #(time, step, time from last time, step from last step)

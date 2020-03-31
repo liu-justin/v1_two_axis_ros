@@ -9,7 +9,7 @@ import pointFinder as pf
 import Point as p
 import stepMath as smath
 import Motor
-import MotorList
+import MotorManager
 import math
 import numpy as np
 import time
@@ -56,7 +56,7 @@ def move_point_talker(pub):
     mm.setAllStates("moving")
     mm.setAllPreviousTimes(time.clock())
     while(mm.checkAllStates("moving")):
-        for motor in [motor for motor in mm if motor.checkState("moving")]:
+        for motor in [motor for motor in vars(mm).values() if motor.checkState("moving")]:
             currentTime = time.clock()
             if (currentTime - motor.previousTime > motor.stepTuple[motor.tupleIndex][2]):
                 rospy.loginfo("motor: %s step: %s moveRelativeFinalStep: %s", motor.motorIndex, motor.step, motor.moveRelativeFinalStep)
@@ -70,7 +70,7 @@ def move_relative_talker(pub):
     mm.setAllStates("moving")
     mm.setAllPreviousTimes(time.clock())
     while(mm.checkAllStates("moving")):
-        for motor in [motor for motor in mm if motor.checkState("moving")]:
+        for motor in [motor for motor in vars(mm).values() if motor.checkState("moving")]:
             currentTime = time.clock()
             if (currentTime - motor.previousTime > smath.homingInterval):
                 rospy.loginfo("motor: %s step: %s moveRelativeFinalStep: %s published direction: %s", motor.motorIndex, motor.step, motor.moveRelativeFinalStep, motor.moveRelativeFinalStep > motor.step)
@@ -87,7 +87,7 @@ def move_relative_off_limit_switch(pub):
     mm.setAllPreviousTimes(time.clock())
     offLimitSwitchSteps = 40
     while(offLimitSwitchSteps >= 0):
-        for motor in mm:
+        for motor in vars(mm).values():
             currentTime = time.clock()
             if (currentTime - motor.previousTime > smath.homingInterval):
                 rospy.loginfo("motor: %s step: %s moveRelativeFinalStep: %s", motor.motorIndex, motor.step, motor.moveRelativeFinalStep)
@@ -106,9 +106,10 @@ def mains_server():
     rospy.spin()
 
 if __name__ == "__main__":
-    mm = MotorList.MotorList()
-    RR = Motor.Motor(mm, -52, 8)
-    RA = Motor.Motor(mm, -26, 15)
+    mm = MotorManager.MotorManager()
+    RR = Motor.Motor(0, -52, 8)
+    RA = Motor.Motor(1, -26, 15)
+    mm.addMotor(RR = RR, RA = RA)
     csm = cs.coordinateSystemManager(csc.mainCS)
     csm.addCoordinateSystem(motorRC = csc.motorRC, motorRR = csc.motorRR, motorRT = csc.motorRT)
 

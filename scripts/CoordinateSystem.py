@@ -113,6 +113,7 @@ class coordinateSystemManager(object):
         # replaced __dict__ with vars(self)
         vars(self).update(kwargs)
     
+    # find a point in the csm
     def __getitem__(self, name):
         return self.findPointMain(name) 
 
